@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rekap Pembayaran Siswa MG01</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <header class="app-header">
+      <h1><i class="fas fa-calculator"></i> Rekap Pembayaran Siswa MG01</h1>
+      <p class="app-description">Sistem Manajemen Pembayaran Sekolah</p>
+    </header>
+
+    <section class="card form-section">
+      <h2><i class="fas fa-plus-circle"></i> Tambah Pembayaran</h2>
+      <form id="formPembayaran">
+        <div class="form-group">
+          <label for="nama">Nama Siswa</label>
+          <input type="text" id="nama" placeholder="Nama lengkap siswa" required />
+        </div>
+        <div class="form-group">
+          <label for="kelas">Kelas</label>
+          <input type="text" id="kelas" placeholder="Contoh: 10 IPA 1" required />
+        </div>
+        <div class="form-group">
+          <label for="triwulan">Triwulan</label>
+          <select id="triwulan" required>
+            <option value="">Pilih Triwulan</option>
+            <option value="1">Triwulan 1 (Jan-Mar)</option>
+            <option value="2">Triwulan 2 (Apr-Jun)</option>
+            <option value="3">Triwulan 3 (Jul-Sep)</option>
+            <option value="4">Triwulan 4 (Okt-Dec)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="jenis">Jenis Pembayaran</label>
+          <select id="jenis" required>
+            <option value="">Pilih Jenis Pembayaran</option>
+            <option value="SPP">SPP</option>
+            <option value="UAT">UAT</option>
+            <option value="Pindahan">Pindahan</option>
+            <option value="Tunggakan">Tunggakan</option>
+            <option value="Adm.D.U">Adm.D.U</option>
+            <option value="Formulir">Formulir</option>
+            <option value="MPLS">MPLS</option> 
+            <option value="Atribut">Atribut</option>
+            <option value="Batik">Batik</option>
+            <option value="Olga">Olga</option>
+            <option value="OSIS">OSIS</option>
+            <option value="LKS1">LKS1</option>
+            <option value="LKS2">LKS2</option>
+            <option value="Rapot">Rapot</option>
+            <option value="UTS1">UTS1</option>
+            <option value="UTS2">UTS2</option>
+            <option value="PAS1">PAS1</option>
+            <option value="PAS1">PAS2</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="jumlah">Jumlah Bayar (Rp)</label>
+          <input type="number" id="jumlah" placeholder="Jumlah dalam rupiah" required min="1000" />
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> Simpan Pembayaran
+        </button>
+      </form>
+    </section>
+
+    <section class="card calendar-section">
+      <h2><i class="fas fa-calendar-alt"></i> Kalender Pembayaran</h2>
+      <div class="calendar-container" id="calendar"></div>
+      <div class="calendar-legend">
+        <div><span class="legend-color triwulan-start"></span> Awal Triwulan</div>
+        <div><span class="legend-color has-payment"></span> Ada Pembayaran</div>
+        <div><span class="legend-color current"></span> Hari Ini</div>
+      </div>
+    </section>
+
+    <section class="card filter-section">
+      <h2><i class="fas fa-filter"></i> Filter Data</h2>
+      <div class="filter-controls">
+        <div class="form-group">
+          <label for="filterKelas">Filter Kelas</label>
+          <select id="filterKelas">
+            <option value="">Semua Kelas</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="filterJenis">Filter Jenis</label>
+          <select id="filterJenis">
+            <option value="">Semua Jenis</option>
+            <option value="SPP">SPP</option>
+            <option value="UAT">UAT</option>
+            <option value="Pindahan">Pindahan</option>
+            <option value="Tunggakan">Tunggakan</option>
+            <option value="Adm.D.U">Adm.D.U</option>
+            <option value="Formulir">Formulir</option>
+            <option value="MPLS">MPLS</option> 
+            <option value="Atribut">Atribut</option>
+            <option value="Batik">Batik</option>
+            <option value="Olga">Olga</option>
+            <option value="OSIS">OSIS</option>
+            <option value="LKS1">LKS1</option>
+            <option value="LKS2">LKS2</option>
+            <option value="Rapot">Rapot</option>
+            <option value="UTS1">UTS1</option>
+            <option value="UTS2">UTS2</option>
+            <option value="PAS1">PAS1</option>
+            <option value="PAS1">PAS2</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="searchNama">Cari Nama/Tanggal</label>
+          <input type="text" id="searchNama" placeholder="Cari berdasarkan nama atau tanggal...">
+        </div>
+      </div>
+    </section>
+
+    <section class="card action-section">
+      <h2><i class="fas fa-cog"></i> Aksi Data</h2>
+      <div class="action-buttons">
+        <button onclick="exportExcel()" class="btn btn-success">
+          <i class="fas fa-file-excel"></i> Export ke Excel
+        </button>
+        <button onclick="backupData()" class="btn btn-info">
+          <i class="fas fa-download"></i> Backup Data
+        </button>
+        <input type="file" id="fileRestore" accept=".json" onchange="restoreData()" style="display: none;" />
+        <button onclick="document.getElementById('fileRestore').click()" class="btn btn-warning">
+          <i class="fas fa-upload"></i> Restore Data
+        </button>
+        <button onclick="clearAllData()" class="btn btn-danger">
+          <i class="fas fa-trash-alt"></i> Hapus Semua Data
+        </button>
+      </div>
+    </section>
+
+    <section class="card data-section">
+      <div class="section-header">
+        <h2><i class="fas fa-table"></i> Data Pembayaran</h2>
+        <div class="total-payment">
+          <span>Total Pembayaran:</span>
+          <strong id="totalPembayaran">Rp0</strong>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table id="tabelData">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama</th>
+              <th>Kelas</th>
+              <th>Triwulan</th>
+              <th>Jenis</th>
+              <th>Jumlah</th>
+              <th>Tanggal</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card summary-section">
+      <h2><i class="fas fa-chart-bar"></i> Rekap Pembayaran</h2>
+      <div class="summary-content">
+        <div class="table-summary">
+          <table id="rekapKelas">
+            <thead>
+              <tr>
+                <th>Kelas</th>
+                <th>Total Pembayaran</th>
+                <th>Jumlah Siswa</th>
+                <th>Rata-rata</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="chart-summary">
+          <div class="chart-container">
+            <canvas id="chartKelas"></canvas>
+          </div>
+          <div class="chart-container">
+            <canvas id="chartJenis"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="printArea" style="display: none;"></div>
+  <div id="notification" class="notification"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
